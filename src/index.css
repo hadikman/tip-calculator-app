@@ -1,12 +1,4 @@
-@font-face {
-  font-family: SpaceMono;
-  src: url('./assets/font/SpaceMono-Regular.ttf');
-}
-@font-face {
-  font-family: SpaceMono;
-  src: url('./assets/font/SpaceMono-Bold.ttf');
-  font-weight: 700;
-}
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 *,
 *::before,
@@ -17,7 +9,7 @@
 }
 
 body {
-  font-family: SpaceMono, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Space Mono';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
