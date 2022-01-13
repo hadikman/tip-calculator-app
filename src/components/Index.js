@@ -1,16 +1,19 @@
-import {useState, useReducer, useEffect} from 'react';
+import {useReducer, useEffect} from 'react';
 import Input from './Input';
 import useImage from '../hooks/useImage';
+// import Reducer from '../store/reducer';
 
 const initialState = {
-  bill: 0,
+  bill: '',
   tip: 0,
   tipValues: [5, 10, 15, 25, 50],
-  people: 0,
+  customTip: '',
+  people: '',
   tipAmount: 0,
   total: 0,
   activatedBtnIndex: '',
-  hasFocused: false,
+  billHasFocused: false,
+  peopleHasFocused: false,
   allInputIsValid: false,
 };
 
@@ -29,13 +32,15 @@ function reducer(state, action) {
       ...state,
       tip,
       activatedBtnIndex: indexActiveBtn,
+      customTip: '',
     };
   }
   if (type === 'CUSTOM_TIP_VALUE') {
     return {
       ...state,
-      tip: +payload,
+      customTip: +payload,
       activatedBtnIndex: '',
+      tip: 0,
     };
   }
   if (type === 'PERSONS') {
@@ -57,12 +62,13 @@ function reducer(state, action) {
     if (payload === 'resetAll') {
       return {
         ...state,
-        bill: 0,
+        bill: '',
         tip: 0,
-        people: 0,
+        people: '',
+        customTip: '',
         tipAmount: 0,
         activatedBtnIndex: '',
-        hasFocused: false,
+        billHasFocused: false,
         allInputIsValid: false,
       };
     }
@@ -73,10 +79,16 @@ function reducer(state, action) {
       allInputIsValid: false,
     };
   }
-  if (type === 'INPUT_FOCUS') {
+  if (type === 'BILL_INPUT_FOCUS') {
     return {
       ...state,
-      hasFocused: true,
+      billHasFocused: true,
+    };
+  }
+  if (type === 'PEOPLE_INPUT_FOCUS') {
+    return {
+      ...state,
+      peopleHasFocused: true,
     };
   }
 
@@ -89,16 +101,23 @@ export default function Index() {
     bill,
     tip,
     tipValues,
+    customTip,
     people,
     tipAmount,
     total,
     activatedBtnIndex,
-    hasFocused,
+    billHasFocused,
+    peopleHasFocused,
     allInputIsValid,
   } = state;
   const {image: logo_image, error: logoHasError} = useImage('logo.svg');
   const calculatedTip = tipAmount.toFixed(2);
   const calculatedTotal = total.toFixed(2);
+
+  function calculateTip(bill, tipInput, people) {
+    const tipAmount = (bill * tipInput) / 100 / people;
+    dispatch({type: 'CALCULATE_TIP_AMOUNT', payload: tipAmount});
+  }
 
   function tipButtonClickHandler(e, index) {
     const tip = Number.parseInt(e.target.textContent);
@@ -108,14 +127,18 @@ export default function Index() {
   useEffect(() => {
     function calculateTipAmount() {
       if (bill > 0 && tip > 0 && people > 0) {
-        const tipAmount = (bill * tip) / 100 / people;
-        dispatch({type: 'CALCULATE_TIP_AMOUNT', payload: tipAmount});
-      } else {
-        dispatch({type: 'RESET_RESULTS'});
+        calculateTip(bill, tip, people);
+        return;
       }
+      if (bill > 0 && customTip > 0 && people > 0) {
+        calculateTip(bill, customTip, people);
+        return;
+      }
+
+      dispatch({type: 'RESET_RESULTS'});
     }
     calculateTipAmount();
-  }, [bill, tip, people]);
+  }, [bill, tip, people, customTip]);
 
   return (
     <main className="main">
@@ -131,8 +154,11 @@ export default function Index() {
               type="number"
               id="billInput"
               value={bill}
-              inputClass="billInput"
+              inputClass={`billInput ${
+                bill === 0 && billHasFocused ? 'error' : ''
+              }`}
               placeholder="0"
+              showAlertMessage={bill === 0}
               onChange={e =>
                 dispatch({type: 'BILL_VALUE', payload: e.target.value})
               }
@@ -158,6 +184,7 @@ export default function Index() {
                 id="customInput"
                 type="number"
                 className={`customInput ${false ? 'invalid' : ''}`}
+                value={customTip}
                 placeholder="Custom"
                 onChange={e =>
                   dispatch({type: 'CUSTOM_TIP_VALUE', payload: e.target.value})
@@ -172,14 +199,15 @@ export default function Index() {
               type="number"
               id="peopleInput"
               inputClass={`peopleInput ${
-                people === 0 && hasFocused ? 'error' : ''
+                people === 0 && peopleHasFocused ? 'error' : ''
               }`}
               value={people}
               placeholder="0"
+              showAlertMessage={people === 0}
               onChange={e =>
                 dispatch({type: 'PERSONS', payload: e.target.value})
               }
-              onFocus={() => dispatch({type: 'INPUT_FOCUS'})}
+              onFocus={() => dispatch({type: 'PEOPLE_INPUT_FOCUS'})}
             />
           </section>
         </section>

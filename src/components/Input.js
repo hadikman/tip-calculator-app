@@ -13,6 +13,7 @@ export default function Input(props) {
     onClick,
     onFocus,
     value,
+    showAlertMessage,
   } = props;
 
   return (
@@ -20,6 +21,7 @@ export default function Input(props) {
       <label className={labelClass} htmlFor={id}>
         {label}
       </label>
+      {showAlertMessage && <span className="alertMessage">Can't be zero</span>}
       <input
         id={id}
         type={type}

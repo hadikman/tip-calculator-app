@@ -55,6 +55,12 @@ input::-webkit-inner-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
 }
+.bill,
+.people {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
 .billInput,
 .customInput,
 .peopleInput {
@@ -182,6 +188,9 @@ input[type='number'] {
 }
 .error {
   border: 2px solid var(--strong-red);
+}
+.alertMessage {
+  color: var(--strong-red);
 }
 .smallSize {
   font-size: 2rem !important;
