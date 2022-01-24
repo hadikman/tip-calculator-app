@@ -1,7 +1,6 @@
 import {useReducer, useEffect} from 'react';
 import Input from './Input';
 import useImage from '../hooks/useImage';
-// import Reducer from '../store/reducer';
 
 const initialState = {
   bill: '',
